@@ -1,5 +1,8 @@
 from django.contrib import admin
 from .models import Address, Category, Product, Cart, Order, ProductSale, Sale
+from django.db.models import FileField
+from .processors import resize_image
+from django import forms
 
 # Register your models here.
 class AddressAdmin(admin.ModelAdmin):
@@ -10,8 +13,8 @@ class AddressAdmin(admin.ModelAdmin):
 
 
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'category_image', 'is_active', 'is_featured', 'updated_at')
-    list_editable = ('slug', 'is_active', 'is_featured')
+    list_display = ('title',  'category_image', 'is_active', 'is_featured', 'updated_at')
+    list_editable = ( 'is_active', 'is_featured')
     list_filter = ('is_active', 'is_featured')
     list_per_page = 10
     search_fields = ('title', 'description')
@@ -19,11 +22,23 @@ class CategoryAdmin(admin.ModelAdmin):
 
 
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ('title', 'slug', 'category', 'product_image', 'is_active', 'is_featured', 'updated_at')
-    list_editable = ('slug', 'category', 'is_active', 'is_featured')
+    print("chekinnnnngg image 00000000000000000000000000000000000000000000000")
+    formfield_overrides = {
+        FileField: {'widget': forms.ClearableFileInput},
+    }
+    def save_model(self, request, obj, form, change):
+        print("chekinnnnngg image 01010------------------------")
+        super().save_model(request, obj, form, change)
+        print("chekinnnnngg imageIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIIII")
+        print(form.changed_data)
+        if 'product_image' in form.changed_data:
+            print("inside resize")
+            resize_image(obj.product_image)
+    list_display = ('title',  'category', 'product_image', 'is_active', 'is_featured', 'updated_at')
+    list_editable = ( 'category', 'is_active', 'is_featured')
     list_filter = ('category', 'is_active', 'is_featured')
     list_per_page = 10
-    search_fields = ('title', 'category', 'short_description')
+    search_fields = ('title', 'category')
     prepopulated_fields = {"slug": ("title", )}
 
 class CartAdmin(admin.ModelAdmin):

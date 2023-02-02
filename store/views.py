@@ -8,11 +8,18 @@ from django.views import View
 import decimal
 from django.contrib.auth.decorators import login_required
 from django.utils.decorators import method_decorator # for Class Based Views
+from django.http import HttpResponse
+from django.shortcuts import redirect
+from django.conf import settings
+from django.core.mail import send_mail
+
 
 
 # Create your views here.
 
 def home(request):
+  
+
     categories = Category.objects.filter(is_active=True, is_featured=True)[:3]
     products = Product.objects.filter(is_active=True, is_featured=True)[:8]
     context = {
@@ -76,6 +83,7 @@ def profile(request):
 class AddressView(View):
     def get(self, request):
         form = AddressForm()
+        print(form)
         return render(request, 'account/add_address.html', {'form': form})
 
     def post(self, request):
@@ -84,8 +92,8 @@ class AddressView(View):
             user=request.user
             locality = form.cleaned_data['locality']
             city = form.cleaned_data['city']
-            state = form.cleaned_data['state']
-            reg = Address(user=user, locality=locality, city=city, state=state)
+            #state = form.cleaned_data['state']
+            reg = Address(user=user, locality=locality, city=city)
             reg.save()
             messages.success(request, "New Address Added Successfully.")
         return redirect('store:profile')
@@ -180,15 +188,23 @@ def checkout(request):
     print("checkout checkout checkout checkout")
     user = request.user
     address_id = request.GET.get('address')
+    if address_id==None:
     
-    address = get_object_or_404(Address, id=address_id)
-    # Get all the products of User in Cart
-    cart = Cart.objects.filter(user=user)
-    for c in cart:
-        # Saving all the products from Cart to Order
-        Order(user=user, address=address, product=c.product, quantity=c.quantity).save()
-        # And Deleting from Cart
-        c.delete()
+       #print(request.path)
+       #print(request.get_full_path())
+       return redirect('store:add-address')
+
+       return HttpResponse("Vous n'vez pas d'adresse")
+        
+    else:
+        address = get_object_or_404(Address, id=address_id)
+        # Get all the products of User in Cart
+        cart = Cart.objects.filter(user=user)
+        for c in cart:
+            # Saving all the products from Cart to Order
+            Order(user=user, address=address, product=c.product, quantity=c.quantity).save()
+            # And Deleting from Cart
+            c.delete()
     return redirect('store:orders')
 
 

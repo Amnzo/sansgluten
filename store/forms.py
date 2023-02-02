@@ -32,8 +32,15 @@ class LoginForm(AuthenticationForm):
 class AddressForm(forms.ModelForm):
     class Meta:
         model = Address
-        fields = ['locality', 'city', 'state']
-        widgets = {'locality':forms.TextInput(attrs={'class':'form-control', 'placeholder':'Popular Place like Restaurant, Religious Site, etc.'}), 'city':forms.TextInput(attrs={'class':'form-control', 'placeholder':'City'}), 'state':forms.TextInput(attrs={'class':'form-control', 'placeholder':'State or Province'})}
+        fields = ['locality', 'city']
+        labels = {
+            'locality': _('localité'),
+            'city': _('Ville'),
+            
+        }
+        widgets = {'locality':forms.TextInput(attrs={'label': 'Full Namee','class':'form-control', 'placeholder':'Popular Place like Restaurant, Religious Site, etc.'}), 'city':forms.TextInput(attrs={'class':'form-control', 'placeholder':'Ville','label': 'Full Name','for': 'rania'}), 'state':forms.TextInput(attrs={'class':'form-control', 'placeholder':'State or Province'})}
+
+
 
 
 class PasswordChangeForm(PasswordChangeForm):
